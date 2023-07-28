@@ -5,8 +5,8 @@ from src.model.entity.ContributedRepo import ContributedRepo
 class ContributedRepoRepository:
 
     @classmethod
-    def create(cls, issueOwner, userId, repoId, repoFullName, issueId, issueTitle, issueBody):
-        contributedRepo = ContributedRepo(issueOwner, userId, repoId, repoFullName, issueId, issueTitle, issueBody)
+    def create(cls, issueNumber, issueOwner, userId, repoId, repoFullName, issueId, issueTitle, issueBody):
+        contributedRepo = ContributedRepo(issueNumber, issueOwner, userId, repoId, repoFullName, issueId, issueTitle, issueBody)
         sql.session.add(contributedRepo)
         sql.session.commit()
         return contributedRepo

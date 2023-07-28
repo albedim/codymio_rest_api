@@ -7,7 +7,9 @@ class ContributedRepoService:
 
     @classmethod
     def create(cls, request):
+        print(request)
         contributedRepo = ContributedRepoRepository.create(
+            request['issue_number'],
             request['issue_owner'],
             request['user_id'],
             request['repo_id'],

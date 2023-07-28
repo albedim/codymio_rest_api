@@ -61,6 +61,13 @@ class UserService:
 
         if user is None:
             return Utils.createWrongResponse(False, Constants.NOT_FOUND, 404), 404
+
+        requestUser = UserRepository.getUserByUsername(user['login'])
+        if requestUser is not None:
+            return Utils.createSuccessResponse(True, {
+                'token': create_access_token(identity=requestUser.toJSON())
+            })
+
         createdUser = UserRepository.signup(user['avatar_url'], user['bio'], user['id'], user['login'], user['name'])
         return Utils.createSuccessResponse(True, {
             'token': create_access_token(identity=createdUser.toJSON())

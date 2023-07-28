@@ -53,6 +53,7 @@ class RepoGithubService:
         for issue in res:
             array.append({
                 'issue_id': issue['id'],
+                'number': issue['number'],
                 'title': issue['title'],
                 'creator_username': issue['user']['login'],
                 'body': issue['body'],

@@ -1,3 +1,5 @@
+from sqlalchemy import text
+
 from src.configuration.config import sql
 from src.model.entity.User import User
 
@@ -54,4 +56,9 @@ class UserRepository:
         user.email = request['email']
         user.password = request['password']
         sql.session.commit()
+
+    @classmethod
+    def getUserByUsername(cls, username):
+        user = sql.session.query(User).filter(User.username == username).first()
+        return user
 

@@ -9,12 +9,14 @@ class ContributedRepo(sql.Model):
     repo_id: int = sql.Column(sql.Integer, nullable=False)
     repo_full_name: str = sql.Column(sql.String(140), nullable=False)
     issue_id: int = sql.Column(sql.Integer, nullable=False)
+    issue_number: int = sql.Column(sql.Integer, nullable=False)
     issue_owner: str = sql.Column(sql.String(40), nullable=False)
     issue_title: str = sql.Column(sql.String(140), nullable=False)
     issue_body: str = sql.Column(sql.String(840), nullable=False)
 
-    def __init__(self, issueOwner, userId, repoId, repoFullName, issueId, issueTitle, issueBody):
+    def __init__(self, issueNumber, issueOwner, userId, repoId, repoFullName, issueId, issueTitle, issueBody):
         self.user_id = userId
+        self.issue_number = issueNumber
         self.repo_id = repoId
         self.repo_full_name = repoFullName
         self.issue_id = issueId
@@ -32,6 +34,7 @@ class ContributedRepo(sql.Model):
             },
             'issue': {
                 'issue_id': self.issue_id,
+                'issue_number': self.issue_number,
                 'issue_owner': self.issue_owner,
                 'issue_title': self.issue_title,
                 'issue_body': self.issue_body
