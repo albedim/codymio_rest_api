@@ -10,10 +10,10 @@ from src.utils.Utils import Utils
 repoGithub: Blueprint = Blueprint('RepoGithubController', __name__, url_prefix=Utils.getURL('repo-github'))
 
 
-@repoGithub.route("/fetch/auto", methods=['GET'])
+@repoGithub.route("/issues/<username>/<repo>", methods=['GET'])
 @cross_origin()
-def autoRepoGithub():
-    return RepoGithubService.getAuto()
+def getIssues(username, repo):
+    return RepoGithubService.getIssues(request.args.get('page'), username, repo)
 
 
 @repoGithub.route("/fetch", methods=['GET'])

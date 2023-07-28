@@ -44,27 +44,19 @@ class RepoGithubService:
             return Utils.createWrongResponse(False, Constants.INVALID_REQUEST, 415), 415
 
     @classmethod
-    def getAuto(cls):
-        page = random.randint(0,34)
-        try:
-            res = requests.get("https://api.github.com/search/repositories?q=open source&page="+str(page))
-            res = res.json()['items']
-            array = []
-            for repo in res:
-                if repo['has_issues']:
-                    array.append({
-                        'github_repo_id': repo['id'],
-                        'forks': repo['forks'],
-                        'name': repo['name'],
-                        'full_name': repo['full_name'],
-                        'tags': repo['topics'],
-                        'open_issues': repo['open_issues'],
-                        'description': repo['description'],
-                        'language': {
-                            "value": repo['language'],
-                            "color": "Constants.LANGUAGES[repo['language']] if repo['language'] is not None else """
-                        }
-                    })
-            return Utils.createSuccessResponse(True, array)
-        except TypeError:
-            return Utils.createWrongResponse(False, Constants.INVALID_REQUEST, 415), 415
+    def getIssues(cls, page, username, repo):
+        res = requests.get("https://api.github.com/repos/"+username + "/" + repo+"/issues?page="+page)
+        res = res.json()
+
+        array = []
+
+        for issue in res:
+            array.append({
+                'issue_id': issue['id'],
+                'title': issue['title'],
+                'creator_username': issue['user']['login'],
+                'body': issue['body'],
+                'created_on': issue['created_at']
+            })
+
+        return Utils.createSuccessResponse(True, array)
