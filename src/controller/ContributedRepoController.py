@@ -19,4 +19,4 @@ def create():
 @contributedRepo.route("/user/<userId>", methods=['GET'])
 @cross_origin()
 def get(userId):
-    return ContributedRepoService.get(userId)
+    return ContributedRepoService.get(Utils.getTokenManually(request), userId)

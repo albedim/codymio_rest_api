@@ -57,20 +57,25 @@ class UserService:
                 415
             ), 415
 
-        user = cls.getEntityFromCode(request)
+        r = cls.getEntityFromCode(request)
 
-        if user is None:
+        if r is None:
             return Utils.createWrongResponse(False, Constants.NOT_FOUND, 404), 404
+
+        user = r['entity']
+        githubToken = r['github_token']
 
         requestUser = UserRepository.getUserByUsername(user['login'])
         if requestUser is not None:
             return Utils.createSuccessResponse(True, {
-                'token': create_access_token(identity=requestUser.toJSON())
+                'token': create_access_token(identity=requestUser.toJSON()),
+                'github_token': githubToken
             })
 
         createdUser = UserRepository.signup(user['avatar_url'], user['bio'], user['id'], user['login'], user['name'])
         return Utils.createSuccessResponse(True, {
-            'token': create_access_token(identity=createdUser.toJSON())
+            'token': create_access_token(identity=createdUser.toJSON()),
+            'github_token': githubToken
         })
 
     @classmethod
@@ -83,7 +88,10 @@ class UserService:
         if res.text.split("=")[1].split("&")[0] == 'bad_verification_code':
             return None
         user = requests.get("https://api.github.com/user", headers={"Authorization": "Bearer "+res.text.split("=")[1].split("&")[0]})
-        return user.json()
+        return {
+            'entity': user.json(),
+            'github_token': res.text.split("=")[1].split("&")[0]
+        }
 
     @classmethod
     def changePassword(cls, request) -> tuple[Any, int] | dict:
@@ -110,8 +118,6 @@ class UserService:
     @classmethod
     def sync(cls, requestUser):
         user = UserRepository.getUserById(requestUser['user_id']).toJSON()
-        a = user
-        b = requestUser
         if user == requestUser:
             return Utils.createSuccessResponse(True, Constants.UP_TO_DATE)
         else:

@@ -15,3 +15,13 @@ class ContributedRepoRepository:
     def get(cls, userId):
         contributedRepos = sql.session.query(ContributedRepo).filter(ContributedRepo.user_id == userId).all()
         return contributedRepos
+
+    @classmethod
+    def setPushed(cls, e):
+        e.pushed = True
+        sql.session.commit()
+
+    @classmethod
+    def setSeen(cls, e):
+        e.unseen = False
+        sql.session.commit()

@@ -116,3 +116,10 @@ class Utils:
             finalArray.append(page)
         return finalArray
 
+    @classmethod
+    def getTokenManually(cls, request):
+        token = request.headers.get("Authorization")
+        if token and token.startswith("Bearer "):
+            return token.split()[1]
+        return None
+
