@@ -79,3 +79,8 @@ class ContributedRepoService:
                 ContributedRepoRepository.setSeen(r)
         return Utils.createSuccessResponse(True, Constants.CREATED)
 
+    @classmethod
+    def remove(cls, contributedRepoId):
+        res = ContributedRepoRepository.remove(contributedRepoId)
+        return Utils.createSuccessResponse(True, Constants.CREATED)
+

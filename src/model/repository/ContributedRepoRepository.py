@@ -1,3 +1,5 @@
+from sqlalchemy import desc
+
 from src.configuration.config import sql
 from src.model.entity.ContributedRepo import ContributedRepo
 
@@ -13,8 +15,14 @@ class ContributedRepoRepository:
 
     @classmethod
     def get(cls, userId):
-        contributedRepos = sql.session.query(ContributedRepo).filter(ContributedRepo.user_id == userId).all()
+        contributedRepos = sql.session.query(ContributedRepo).filter(ContributedRepo.user_id == userId).order_by(desc(ContributedRepo.contributed_id)).all()
         return contributedRepos
+
+    @classmethod
+    def remove(cls, contributedRepoId):
+        contributedRepo = sql.session.query(ContributedRepo).filter(ContributedRepo.contributed_id == contributedRepoId).delete()
+        sql.session.commit()
+        return contributedRepo
 
     @classmethod
     def setPushed(cls, e):

@@ -33,10 +33,7 @@ class RepoGithubService:
                         'tags': repo['topics'],
                         'open_issues': repo['open_issues'],
                         'description': repo['description'],
-                        'language': {
-                            "value": repo['language'],
-                            "color": "Constants.LANGUAGES[repo['language']] if repo['language'] is not None else """
-                        }
+                        'language': repo['language']
                     })
 
             return Utils.createSuccessResponse(True, array)

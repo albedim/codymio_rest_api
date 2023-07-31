@@ -15,7 +15,7 @@ class ContributedRepo(sql.Model):
     issue_number: int = sql.Column(sql.Integer, nullable=False)
     issue_owner: str = sql.Column(sql.String(40), nullable=False)
     issue_title: str = sql.Column(sql.String(140), nullable=False)
-    issue_body: str = sql.Column(sql.String(840), nullable=False)
+    issue_body: str = sql.Column(sql.String(840), nullable=True)
 
     def __init__(self, issueNumber, issueOwner, userId, repoId, repoFullName, issueId, issueTitle, issueBody):
         self.user_id = userId

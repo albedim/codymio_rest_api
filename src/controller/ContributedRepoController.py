@@ -16,6 +16,12 @@ def create():
     return ContributedRepoService.create(request.json)
 
 
+@contributedRepo.route("/<contributedRepoId>", methods=['DELETE'])
+@cross_origin()
+def remove(contributedRepoId):
+    return ContributedRepoService.remove(contributedRepoId)
+
+
 @contributedRepo.route("/seen", methods=['POST'])
 @cross_origin()
 def seen():
