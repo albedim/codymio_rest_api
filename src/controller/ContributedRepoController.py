@@ -16,6 +16,12 @@ def create():
     return ContributedRepoService.create(request.json)
 
 
+@contributedRepo.route("/seen", methods=['POST'])
+@cross_origin()
+def seen():
+    return ContributedRepoService.setSeen(request.json)
+
+
 @contributedRepo.route("/user/<userId>", methods=['GET'])
 @cross_origin()
 def get(userId):

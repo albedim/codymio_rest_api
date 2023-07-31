@@ -68,13 +68,15 @@ class UserService:
         requestUser = UserRepository.getUserByUsername(user['login'])
         if requestUser is not None:
             return Utils.createSuccessResponse(True, {
-                'token': create_access_token(identity=requestUser.toJSON()),
+                'token': create_access_token(identity=requestUser.toJSON(),
+                                             expires_delta=timedelta(weeks=4)),
                 'github_token': githubToken
             })
 
         createdUser = UserRepository.signup(user['avatar_url'], user['bio'], user['id'], user['login'], user['name'])
         return Utils.createSuccessResponse(True, {
-            'token': create_access_token(identity=createdUser.toJSON()),
+            'token': create_access_token(identity=createdUser.toJSON(),
+                                         expires_delta=timedelta(weeks=4)),
             'github_token': githubToken
         })
 
@@ -122,5 +124,6 @@ class UserService:
             return Utils.createSuccessResponse(True, Constants.UP_TO_DATE)
         else:
             return Utils.createSuccessResponse(False, {
-                "token": create_access_token(identity=user.toJSON())
+                "token": create_access_token(identity=user.toJSON(),
+                                             expires_delta=timedelta(weeks=4))
             })

@@ -15,12 +15,12 @@ class RepoGithubService:
     @classmethod
     def get(cls, language, query, page):
         auto = language == "all" and query == "all"
-        page = random.randint(0,34) if auto else page
+        page = random.randint(0, 34) if auto else page
         print(page)
         try:
-            res = requests.get("https://api.github.com/search/repositories?q=open source "+
-                               ("" if auto else query)+
-                               ("" if auto else "language:"+language)+"&page="+str(page))
+            res = requests.get("https://api.github.com/search/repositories?q=open source " +
+                               ("" if auto else query) +
+                               ("" if auto else "language:" + language) + "&page=" + str(page))
             res = res.json()['items']
             array = []
             for repo in res:
@@ -44,8 +44,9 @@ class RepoGithubService:
             return Utils.createWrongResponse(False, Constants.INVALID_REQUEST, 415), 415
 
     @classmethod
-    def getIssues(cls, page, username, repo):
-        res = requests.get("https://api.github.com/repos/"+username + "/" + repo+"/issues?page="+page)
+    def getIssues(cls, token, page, username, repo):
+        res = requests.get("https://api.github.com/repos/" + username + "/" + repo + "/issues?page=" + page,
+                           headers={"Authorization": "Bearer " + token})
         res = res.json()
 
         array = []

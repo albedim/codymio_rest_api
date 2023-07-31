@@ -6,7 +6,8 @@ class ContributedRepo(sql.Model):
     __tablename__ = 'contributed_repos'
     contributed_id: int = sql.Column(sql.Integer, primary_key=True)
     unseen: bool = sql.Column(sql.Boolean, nullable=False)
-    pushed: bool = sql.Column(sql.Boolean, nullable=True)
+    merged: bool = sql.Column(sql.Boolean, nullable=False)
+    pushed: bool = sql.Column(sql.Boolean, nullable=False)
     user_id: int = sql.Column(sql.Integer, nullable=False)
     repo_id: int = sql.Column(sql.Integer, nullable=False)
     repo_full_name: str = sql.Column(sql.String(140), nullable=False)
@@ -25,7 +26,8 @@ class ContributedRepo(sql.Model):
         self.issue_owner = issueOwner
         self.issue_title = issueTitle
         self.pushed = False
-        self.unseen = False
+        self.unseen = True
+        self.merged = False
         self.issue_body = issueBody
 
     def toJSON(self, **kvargs):
@@ -34,6 +36,7 @@ class ContributedRepo(sql.Model):
             'user_id': self.user_id,
             'pushed': self.pushed,
             'unseen': self.unseen,
+            'merged': self.merged,
             'repository': {
                 'repo_id': self.repo_id,
                 'repo_full_name': self.repo_full_name,

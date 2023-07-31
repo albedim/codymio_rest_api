@@ -20,8 +20,16 @@ class ContributedRepoRepository:
     def setPushed(cls, e):
         e.pushed = True
         sql.session.commit()
+        return e
 
     @classmethod
     def setSeen(cls, e):
         e.unseen = False
         sql.session.commit()
+        return e
+
+    @classmethod
+    def setMerged(cls, e):
+        e.merged = True
+        sql.session.commit()
+        return e

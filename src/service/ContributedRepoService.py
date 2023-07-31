@@ -26,23 +26,30 @@ class ContributedRepoService:
     @classmethod
     def getStatus(cls, token, e: ContributedRepo, userId):
 
-        if not e.pushed:
-            res = requests.get("https://api.github.com/repos/" + e.repo_full_name + "/pulls",
-                               headers={"Authorization": "Bearer "+token})
-            res = res.json()
-            for r in res:
-                if r['user']['id'] == userId:
-                    ContributedRepoRepository.setPushed(e)
-        res = requests.get("https://api.github.com/repos/"+e.repo_full_name+"/pulls/"+str(e.issue_number),
-                           headers={"Authorization": "Bearer "+token})
+        merged = False
+        res = requests.get("https://api.github.com/repos/" + e.repo_full_name + "/pulls",
+                           headers={"Authorization": "Bearer " + token})
         res = res.json()
-        print(res)
-        r = {
+        try:
+            if not e.pushed:
+                for r in res:
+                    if r['user']['id'] == userId:
+                        e = ContributedRepoRepository.setPushed(e)
+            else:
+                merged = True
+                for r in res:
+                    if r['user']['id'] == userId:
+                        merged = False
+                if merged:
+                    e = ContributedRepoRepository.setMerged(e)
+        except TypeError:
+            pass
+
+        return {
             'pushed': e.pushed,
-            'waiting': e.pushed and res['merged_at'] is None,
-            'merged': res['merged_at'] is not None
+            'waiting': e.pushed and not merged,
+            'merged': merged
         }
-        return r
 
     @classmethod
     def get(cls, token, userId):
@@ -59,8 +66,16 @@ class ContributedRepoService:
                 res['merged'].append(e.toJSON(status=r))
                 if e.unseen:
                     res['unseen'] += 1
-                    ContributedRepoRepository.setSeen(e)
             else:
                 res['unmerged'].append(e.toJSON(status=r))
 
         return Utils.createSuccessResponse(True, res)
+
+    @classmethod
+    def setSeen(cls, request):
+        res = ContributedRepoRepository.get(request['user_id'])
+        for r in res:
+            if r.merged:
+                ContributedRepoRepository.setSeen(r)
+        return Utils.createSuccessResponse(True, Constants.CREATED)
+
