@@ -43,8 +43,8 @@ class RepoGithubService:
     @classmethod
     def getIssues(cls, token, page, username, repo):
         try:
-            res = requests.get("https://api.github.com/repos/" + username + "/" + repo + "/issues?page=" + page)
-                               #headers={"Authorization": "Bearer " + token})
+            res = requests.get("https://api.github.com/repos/" + username + "/" + repo + "/issues?page=" + page,
+                               headers={"Authorization": "Bearer " + token})
             res = res.json()
 
             array = []
