@@ -1,17 +1,19 @@
 import requests
 
-from src.model.entity.ContributedRepo import ContributedRepo
+from src.model.entity.Contribution import Contribution
 from src.model.repository.UserRepository import UserRepository
 from src.utils.Constants import Constants
 from src.utils.Utils import Utils
-from src.model.repository.ContributedRepoRepository import ContributedRepoRepository
+from src.model.repository.ContributionRepository import ContributionRepository
 
 
-class ContributedRepoService:
+class ContributionService:
 
     @classmethod
     def create(cls, request):
-        contributedRepo = ContributedRepoRepository.create(
+        if cls.hasContributed(request['repo_id'], request['user_id']):
+            return Utils.createWrongResponse(False, Constants.ALREADY_CREATED, 409), 409
+        contributedRepo = ContributionRepository.create(
             request['issue_number'],
             request['issue_owner'],
             request['user_id'],
@@ -24,7 +26,7 @@ class ContributedRepoService:
         return Utils.createSuccessResponse(True, Constants.CREATED)
 
     @classmethod
-    def getStatus(cls, token, e: ContributedRepo, userId):
+    def getStatus(cls, token, e: Contribution, userId):
 
         merged = False
         res = requests.get("https://api.github.com/repos/" + e.repo_full_name + "/pulls",
@@ -34,14 +36,14 @@ class ContributedRepoService:
             if not e.pushed:
                 for r in res:
                     if r['user']['id'] == userId:
-                        e = ContributedRepoRepository.setPushed(e)
+                        e = ContributionRepository.setPushed(e)
             else:
                 merged = True
                 for r in res:
                     if r['user']['id'] == userId:
                         merged = False
                 if merged:
-                    e = ContributedRepoRepository.setMerged(e)
+                    e = ContributionRepository.setMerged(e)
         except TypeError:
             pass
 
@@ -53,7 +55,7 @@ class ContributedRepoService:
 
     @classmethod
     def get(cls, token, userId):
-        contributedRepos: list[ContributedRepo] = ContributedRepoRepository.get(userId)
+        contributedRepos: list[Contribution] = ContributionRepository.get(userId)
         user = UserRepository.getUserById(userId)
         res = {
             "unseen": 0,
@@ -73,14 +75,19 @@ class ContributedRepoService:
 
     @classmethod
     def setSeen(cls, request):
-        res = ContributedRepoRepository.get(request['user_id'])
+        res = ContributionRepository.get(request['user_id'])
         for r in res:
             if r.merged:
-                ContributedRepoRepository.setSeen(r)
+                ContributionRepository.setSeen(r)
         return Utils.createSuccessResponse(True, Constants.CREATED)
 
     @classmethod
     def remove(cls, contributedRepoId):
-        res = ContributedRepoRepository.remove(contributedRepoId)
+        res = ContributionRepository.remove(contributedRepoId)
         return Utils.createSuccessResponse(True, Constants.CREATED)
+
+    @classmethod
+    def hasContributed(cls, repoId, userId):
+        contribution = ContributionRepository.getByRepoIdAndUserId(repoId, userId)
+        return contribution is not None
 

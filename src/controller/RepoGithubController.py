@@ -7,7 +7,7 @@ from src.service.UserService import UserService
 from src.utils.Utils import Utils
 
 
-repoGithub: Blueprint = Blueprint('RepoGithubController', __name__, url_prefix=Utils.getURL('repo-github'))
+repoGithub: Blueprint = Blueprint('RepoGithubController', __name__, url_prefix=Utils.getURL('repositories'))
 
 
 @repoGithub.route("/<username>/<repo>/issues", methods=['GET'])
@@ -18,5 +18,6 @@ def getIssues(username, repo):
 
 @repoGithub.route("/fetch", methods=['GET'])
 @cross_origin()
+@jwt_required()
 def getRepoGithub():
-    return RepoGithubService.get(request.args.get("language"), request.args.get("query"), request.args.get("page"))
+    return RepoGithubService.get(get_jwt_identity()['user_id'], request.args.get("language"), request.args.get("query"), request.args.get("page"))

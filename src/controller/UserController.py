@@ -14,30 +14,6 @@ def signin():
     return UserService.signin(request.json)
 
 
-@user.route("/get/<userId>", methods=['GET'])
-@cross_origin()
-def get(userId):
-    return UserService.getUserById(userId)
-
-
-@user.route("/password_forgotten_token/<email>", methods=['PUT'])
-@cross_origin()
-def createPasswordForgottenToken(email):
-    return UserService.createForgottenPasswordToken(email)
-
-
-@user.route("/password_forgotten_token/<token>", methods=['GET'])
-@cross_origin()
-def getUserByPasswordForgottenToken(token):
-    return UserService.getUserByPasswordForgottenToken(token)
-
-
-@user.route("/change_password", methods=['PUT'])
-@cross_origin()
-def changePassword():
-    return UserService.changePassword(request.json)
-
-
 @user.route("/github-access", methods=['POST'])
 @cross_origin()
 def signup():
@@ -49,11 +25,5 @@ def signup():
 @jwt_required()
 def sync():
     return UserService.sync(get_jwt_identity())
-
-
-@user.route("/change/<userId>", methods=['PUT'])
-@cross_origin()
-def change(userId):
-    return UserService.change(userId, request.json)
 
 

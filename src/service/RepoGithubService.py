@@ -6,6 +6,7 @@ import requests
 from flask_jwt_extended import create_access_token
 from src.model.entity.User import User
 from src.model.repository.UserRepository import UserRepository
+from src.service.ContributionService import ContributionService
 from src.utils.Constants import Constants
 from src.utils.Utils import Utils
 
@@ -13,10 +14,10 @@ from src.utils.Utils import Utils
 class RepoGithubService:
 
     @classmethod
-    def get(cls, language, query, page):
+    def get(cls, userId, language, query, page):
         auto = language == "all" and query == "all"
         page = random.randint(0, 34) if auto else page
-        print(page)
+
         try:
             res = requests.get("https://api.github.com/search/repositories?q=open source " +
                                ("" if auto else query) +
@@ -30,6 +31,7 @@ class RepoGithubService:
                         'forks': repo['forks'],
                         'name': repo['name'],
                         'full_name': repo['full_name'],
+                        'has_contributed': ContributionService.hasContributed(repo['id'], userId),
                         'tags': repo['topics'],
                         'open_issues': repo['open_issues'],
                         'description': repo['description'],

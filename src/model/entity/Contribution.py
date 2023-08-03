@@ -2,9 +2,9 @@ import datetime
 from src.configuration.config import sql
 
 
-class ContributedRepo(sql.Model):
-    __tablename__ = 'contributed_repos'
-    contributed_id: int = sql.Column(sql.Integer, primary_key=True)
+class Contribution(sql.Model):
+    __tablename__ = 'contributions'
+    contribution_id: int = sql.Column(sql.Integer, primary_key=True)
     unseen: bool = sql.Column(sql.Boolean, nullable=False)
     merged: bool = sql.Column(sql.Boolean, nullable=False)
     pushed: bool = sql.Column(sql.Boolean, nullable=False)
@@ -32,7 +32,7 @@ class ContributedRepo(sql.Model):
 
     def toJSON(self, **kvargs):
         obj = {
-            'contributed_id': self.contributed_id,
+            'contribution_id': self.contribution_id,
             'user_id': self.user_id,
             'pushed': self.pushed,
             'unseen': self.unseen,
