@@ -50,15 +50,16 @@ class RepoGithubService:
             array = []
 
             for issue in res:
-                array.append({
-                    'issue_id': issue['id'],
-                    'number': issue['number'],
-                    'title': issue['title'],
-                    'creator_username': issue['user']['login'],
-                    'body': issue['body'],
-                    'has_pull_requests': cls.hasPullRequests(issue),
-                    'created_on': issue['created_at']
-                })
+                if len(issue['assignees']) == 0:
+                    array.append({
+                        'issue_id': issue['id'],
+                        'number': issue['number'],
+                        'title': issue['title'],
+                        'creator_username': issue['user']['login'],
+                        'body': issue['body'],
+                        'has_pull_requests': cls.hasPullRequests(issue),
+                        'created_on': issue['created_at']
+                    })
 
             return Utils.createSuccessResponse(True, sorted(array, key=cls.orderByHasPullRequests))
         except TypeError:
