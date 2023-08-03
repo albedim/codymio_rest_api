@@ -42,20 +42,34 @@ class RepoGithubService:
 
     @classmethod
     def getIssues(cls, token, page, username, repo):
-        res = requests.get("https://api.github.com/repos/" + username + "/" + repo + "/issues?page=" + page,
-                           headers={"Authorization": "Bearer " + token})
-        res = res.json()
+        try:
+            res = requests.get("https://api.github.com/repos/" + username + "/" + repo + "/issues?page=" + page)
+                               #headers={"Authorization": "Bearer " + token})
+            res = res.json()
 
-        array = []
+            array = []
 
-        for issue in res:
-            array.append({
-                'issue_id': issue['id'],
-                'number': issue['number'],
-                'title': issue['title'],
-                'creator_username': issue['user']['login'],
-                'body': issue['body'],
-                'created_on': issue['created_at']
-            })
+            for issue in res:
+                array.append({
+                    'issue_id': issue['id'],
+                    'number': issue['number'],
+                    'title': issue['title'],
+                    'creator_username': issue['user']['login'],
+                    'body': issue['body'],
+                    'has_pull_requests': cls.hasPullRequests(issue),
+                    'created_on': issue['created_at']
+                })
 
-        return Utils.createSuccessResponse(True, array)
+            return Utils.createSuccessResponse(True, sorted(array, key=cls.orderByHasPullRequests))
+        except TypeError:
+            return Utils.createWrongResponse(False, Constants.INVALID_REQUEST, 400), 400
+
+    @classmethod
+    def orderByHasPullRequests(cls, array):
+        if array['has_pull_requests']:
+            return 1
+        return 0
+
+    @classmethod
+    def hasPullRequests(cls, issue):
+        return "pull_request" in issue
