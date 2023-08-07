@@ -11,7 +11,7 @@ class ContributionService:
 
     @classmethod
     def create(cls, request):
-        if cls.hasContributed(request['repo_id'], request['user_id']):
+        if cls.hasContributed(request['issue_id'], request['repo_id'], request['user_id']):
             return Utils.createWrongResponse(False, Constants.ALREADY_CREATED, 409), 409
         contributedRepo = ContributionRepository.create(
             request['issue_number'],
@@ -26,21 +26,19 @@ class ContributionService:
         return Utils.createSuccessResponse(True, Constants.CREATED)
 
     @classmethod
-    def getStatus(cls, token, e: Contribution, userId):
+    def updateStatus(cls, token, userId, e: Contribution):
 
-        merged = False
         res = requests.get("https://api.github.com/repos/" + e.repo_full_name + "/pulls",
-                           headers={"Authorization": "Bearer " + token})
-        res = res.json()
+                           headers={"Authorization": "Bearer " + token}).json()
         try:
             if not e.pushed:
                 for r in res:
-                    if r['user']['id'] == userId and r['number'] == e.issue_number:
+                    if r['user']['id'] == userId:
                         e = ContributionRepository.setPushed(e)
             else:
                 merged = True
                 for r in res:
-                    if r['user']['id'] == userId and r['number'] == e.issue_number:
+                    if r['user']['id'] == userId:
                         merged = False
                 if merged:
                     e = ContributionRepository.setMerged(e)
@@ -49,8 +47,8 @@ class ContributionService:
 
         return {
             'pushed': e.pushed,
-            'waiting': e.pushed and not merged,
-            'merged': merged
+            'waiting': e.pushed and not e.merged,
+            'merged': e.merged
         }
 
     @classmethod
@@ -63,13 +61,20 @@ class ContributionService:
             "unmerged": []
         }
         for e in contributedRepos:
-            r = cls.getStatus(token, e, user.user_github_id)
-            if r['merged']:
-                res['merged'].append(e.toJSON(status=r))
+            if e.merged:
+                res['merged'].append(e.toJSON(
+                    status={
+                        'pushed': True,
+                        'waiting': False,
+                        'merged': True
+                    },
+                    removable=False
+                ))
                 if e.unseen:
                     res['unseen'] += 1
             else:
-                res['unmerged'].append(e.toJSON(status=r))
+                r = cls.updateStatus(token, user.user_github_id, e)
+                res['unmerged'].append(e.toJSON(removable=True, status=r))
 
         return Utils.createSuccessResponse(True, res)
 
@@ -88,6 +93,10 @@ class ContributionService:
 
     @classmethod
     def hasContributed(cls, issueId, repoId, userId):
-        contribution = ContributionRepository.getByRepoIdAndUserId(issueId, repoId, userId)
+        contribution = ContributionRepository.getByRepoIdAndUserId(
+            issueId,
+            repoId,
+            userId
+        )
         return contribution is not None
 
