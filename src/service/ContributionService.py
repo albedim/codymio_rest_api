@@ -35,12 +35,12 @@ class ContributionService:
         try:
             if not e.pushed:
                 for r in res:
-                    if r['user']['id'] == userId:
+                    if r['user']['id'] == userId and r['number'] == e.issue_number:
                         e = ContributionRepository.setPushed(e)
             else:
                 merged = True
                 for r in res:
-                    if r['user']['id'] == userId:
+                    if r['user']['id'] == userId and r['number'] == e.issue_number:
                         merged = False
                 if merged:
                     e = ContributionRepository.setMerged(e)
@@ -87,7 +87,7 @@ class ContributionService:
         return Utils.createSuccessResponse(True, Constants.CREATED)
 
     @classmethod
-    def hasContributed(cls, repoId, userId):
-        contribution = ContributionRepository.getByRepoIdAndUserId(repoId, userId)
+    def hasContributed(cls, issueId, repoId, userId):
+        contribution = ContributionRepository.getByRepoIdAndUserId(issueId, repoId, userId)
         return contribution is not None
 

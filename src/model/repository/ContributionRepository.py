@@ -44,7 +44,8 @@ class ContributionRepository:
         return e
 
     @classmethod
-    def getByRepoIdAndUserId(cls, repoId, userId):
+    def getByRepoIdAndUserId(cls, issueId, repoId, userId):
         contribution = sql.session.query(Contribution).filter(Contribution.repo_id == repoId)\
+            .filter(Contribution.issue_id == issueId)\
             .filter(Contribution.user_id == userId).first()
         return contribution

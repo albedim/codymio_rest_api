@@ -31,7 +31,6 @@ class RepoGithubService:
                         'forks': repo['forks'],
                         'name': repo['name'],
                         'full_name': repo['full_name'],
-                        'has_contributed': ContributionService.hasContributed(repo['id'], userId),
                         'tags': repo['topics'],
                         'open_issues': repo['open_issues'],
                         'description': repo['description'],
@@ -43,20 +42,20 @@ class RepoGithubService:
             return Utils.createWrongResponse(False, Constants.INVALID_REQUEST, 415), 415
 
     @classmethod
-    def getIssues(cls, token, page, username, repo):
+    def getIssues(cls, token, page, userId, repoId, repoFullName):
         try:
-            res = requests.get("https://api.github.com/repos/" + username + "/" + repo + "/issues?page=" + page,
+            res = requests.get("https://api.github.com/repos/" + repoFullName + "/issues?page=" + page,
                                headers={"Authorization": "Bearer " + token})
             res = res.json()
 
             array = []
-
             for issue in res:
                 if len(issue['assignees']) == 0:
                     array.append({
                         'issue_id': issue['id'],
                         'number': issue['number'],
                         'title': issue['title'],
+                        'has_contributed': ContributionService.hasContributed(issue['id'], repoId, userId),
                         'creator_username': issue['user']['login'],
                         'body': issue['body'],
                         'has_pull_requests': cls.hasPullRequests(issue),
