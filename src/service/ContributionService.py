@@ -45,11 +45,12 @@ class ContributionService:
         except TypeError:
             pass
 
-        return {
-            'pushed': e.pushed,
-            'waiting': e.pushed and not e.merged,
-            'merged': e.merged
-        }
+        if not e.pushed:
+            return 'none'
+        if e.pushed and not e.merged:
+            return 'pushed'
+        if e.merged:
+            return 'completed'
 
     @classmethod
     def get(cls, token, userId):
@@ -57,24 +58,20 @@ class ContributionService:
         user = UserRepository.getUserById(userId)
         res = {
             "unseen": 0,
-            "merged": [],
-            "unmerged": []
+            "completed": [],
+            "uncompleted": []
         }
         for e in contributedRepos:
             if e.merged:
-                res['merged'].append(e.toJSON(
-                    status={
-                        'pushed': True,
-                        'waiting': False,
-                        'merged': True
-                    },
+                res['completed'].append(e.toJSON(
+                    status="completed",
                     removable=False
                 ))
                 if e.unseen:
                     res['unseen'] += 1
             else:
                 r = cls.updateStatus(token, user.user_github_id, e)
-                res['unmerged'].append(e.toJSON(removable=True, status=r))
+                res['uncompleted'].append(e.toJSON(removable=True, status=r))
 
         return Utils.createSuccessResponse(True, res)
 
@@ -99,4 +96,12 @@ class ContributionService:
             userId
         )
         return contribution is not None
+
+    @classmethod
+    def contributable(cls, repoId, userId):
+        contribution = ContributionRepository.getUnmergedContributions(
+            repoId,
+            userId
+        )
+        return contribution is None
 

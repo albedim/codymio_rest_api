@@ -32,6 +32,7 @@ class RepoGithubService:
                         'name': repo['name'],
                         'full_name': repo['full_name'],
                         'tags': repo['topics'],
+                        'contributable': ContributionService.contributable(repo['id'], userId),
                         'open_issues': repo['open_issues'],
                         'description': repo['description'],
                         'language': repo['language']

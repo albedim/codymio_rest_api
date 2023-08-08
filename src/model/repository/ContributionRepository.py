@@ -49,3 +49,10 @@ class ContributionRepository:
             .filter(Contribution.issue_id == issueId)\
             .filter(Contribution.user_id == userId).first()
         return contribution
+
+    @classmethod
+    def getUnmergedContributions(cls, repoId, userId):
+        contribution = sql.session.query(Contribution).filter(Contribution.repo_id == repoId)\
+            .filter(Contribution.merged == False)\
+            .filter(Contribution.user_id == userId).first()
+        return contribution
