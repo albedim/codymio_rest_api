@@ -73,7 +73,7 @@ class UserService:
                 'github_token': githubToken
             })
 
-        createdUser = UserRepository.signup(user['avatar_url'], user['bio'], user['id'], user['login'], user['name'])
+        createdUser = UserRepository.signup(user['avatar_url'], user['id'], user['login'])
         return Utils.createSuccessResponse(True, {
             'token': create_access_token(identity=createdUser.toJSON(),
                                          expires_delta=timedelta(weeks=4)),

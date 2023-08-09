@@ -12,8 +12,8 @@ class UserRepository:
         return user
 
     @classmethod
-    def signup(cls, avatar, bio, user_github_id, username, name) -> User:
-        user: User = User(avatar, bio, user_github_id, username, name)
+    def signup(cls, avatar, user_github_id, username) -> User:
+        user: User = User(avatar, user_github_id, username)
         sql.session.add(user)
         sql.session.commit()
         return user
