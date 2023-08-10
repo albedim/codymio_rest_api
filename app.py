@@ -1,10 +1,12 @@
 from flask_jwt_extended import JWTManager
 
 from src.configuration.config import app, sql
-from src.controller import UserController, RepoGithubController, ServerController, ContributionController
+from src.controller import UserController, RepoGithubController, ServerController, ContributionController, \
+    NotificationController
 
 # controllers init
 app.register_blueprint(RepoGithubController.repoGithub)
+app.register_blueprint(NotificationController.notification)
 app.register_blueprint(UserController.user)
 app.register_blueprint(ServerController.server)
 app.register_blueprint(ContributionController.contribution)

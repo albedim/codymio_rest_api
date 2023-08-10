@@ -2,6 +2,7 @@ import requests
 
 from src.model.entity.Contribution import Contribution
 from src.model.repository.UserRepository import UserRepository
+from src.service.NotificationService import NotificationService
 from src.utils.Constants import Constants
 from src.utils.Utils import Utils
 from src.model.repository.ContributionRepository import ContributionRepository
@@ -23,25 +24,42 @@ class ContributionService:
             request['issue_title'],
             request['issue_body']
         )
-        return Utils.createSuccessResponse(True, Constants.CREATED)
+        notifications = NotificationService.create(
+            Constants.ADD_CONTRIBUTION_NOTIFICATION["content"].replace("{repository}", request['repo_full_name']),
+            Constants.ADD_CONTRIBUTION_NOTIFICATION['title'],
+            request['user_id']
+        )
+        return Utils.createSuccessResponse(True, notifications)
 
     @classmethod
-    def updateStatus(cls, token, userId, e: Contribution):
+    def __updateStatus(cls, token, userId, userGithubId, e: Contribution):
 
         res = requests.get("https://api.github.com/repos/" + e.repo_full_name + "/pulls",
                            headers={"Authorization": "Bearer " + token}).json()
         try:
             if not e.pushed:
                 for r in res:
-                    if r['user']['id'] == userId:
+                    if r['user']['id'] == userGithubId:
                         e = ContributionRepository.setPushed(e)
+                        NotificationService.create(
+                            Constants.PUSHED_NOTIFICATION['content'].replace("{repository}", e.repo_full_name),
+                            Constants.PUSHED_NOTIFICATION['title'],
+                            userId
+                        )
+                        break
             else:
-                merged = True
-                for r in res:
-                    if r['user']['id'] == userId:
-                        merged = False
-                if merged:
-                    e = ContributionRepository.setMerged(e)
+                if not e.merged:
+                    merged = True
+                    for r in res:
+                        if r['user']['id'] == userGithubId:
+                            merged = False
+                    if merged:
+                        e = ContributionRepository.setMerged(e)
+                        NotificationService.create(
+                            Constants.COMPLETED_CONTRIBUTION_NOTIFICATION['content'],
+                            Constants.COMPLETED_CONTRIBUTION_NOTIFICATION['title'],
+                            userId
+                        )
         except TypeError:
             pass
 
@@ -70,10 +88,18 @@ class ContributionService:
                 if e.unseen:
                     res['unseen'] += 1
             else:
-                r = cls.updateStatus(token, user.user_github_id, e)
+                r = cls.__updateStatus(token, userId, user.user_github_id, e)
                 res['uncompleted'].append(e.toJSON(removable=True, status=r))
 
         return Utils.createSuccessResponse(True, res)
+
+    @classmethod
+    def updateStatuses(cls, token, request):
+        contributedRepos: list[Contribution] = ContributionRepository.get(request['user_id'])
+        user = UserRepository.getUserById(request['user_id'])
+        for e in contributedRepos:
+            cls.__updateStatus(token, user.user_id, user.user_github_id, e)
+        return Utils.createSuccessResponse(True, Constants.CREATED)
 
     @classmethod
     def setSeen(cls, request):

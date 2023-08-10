@@ -16,6 +16,12 @@ def create():
     return ContributionService.create(request.json)
 
 
+@contribution.route("/update", methods=['POST'])
+@cross_origin()
+def update():
+    return ContributionService.updateStatuses(Utils.getTokenManually(request), request.json)
+
+
 @contribution.route("/<contributedRepoId>", methods=['DELETE'])
 @cross_origin()
 def remove(contributedRepoId):

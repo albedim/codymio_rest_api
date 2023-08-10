@@ -424,6 +424,19 @@ class Constants:
         "Zephir"
     ]
 
+    ADD_CONTRIBUTION_NOTIFICATION = {
+        "title": "New contribution",
+        "content": "You just started contributing to {repository}."
+    }
+    PUSHED_NOTIFICATION = {
+        "title": "Update",
+        "content": "You just opened a pull request for: {repository}."
+    }
+    COMPLETED_CONTRIBUTION_NOTIFICATION = {
+        "title": "Update",
+        "content": "One of your contributions has been completed."
+    }
+
     EMAIL = ''
     PASSWORD = ''
     PASSWORD_FORGOTTEN_EMAIL: str = "Hey! \nHere's the link to recover your account: https://cryllet-fe.pages.dev/create_password/{token}"
