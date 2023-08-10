@@ -89,7 +89,7 @@ class ContributionService:
                     res['unseen'] += 1
             else:
                 r = cls.__updateStatus(token, userId, user.user_github_id, e)
-                res['uncompleted'].append(e.toJSON(removable=True, status=r))
+                res['uncompleted'].append(e.toJSON(removable=r == "none", status=r))
 
         return Utils.createSuccessResponse(True, res)
 
