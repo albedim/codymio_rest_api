@@ -24,7 +24,7 @@ class NotificationRepository:
     @classmethod
     def get(cls, userId):
         notifications = sql.session.query(Notification)\
-            .filter(Notification.user_id == userId).all()
+            .filter(Notification.user_id == userId).order_by(desc(Notification.notification_id)).all()
         return notifications
 
     @classmethod
