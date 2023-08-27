@@ -13,16 +13,20 @@ from src.utils.Utils import Utils
 
 class RepoGithubService:
 
+    GET_REPOS_API_CALL = "https://api.github.com/search/repositories?q=open source {query}" + " language:{language}" + "&page={page}"
+
     @classmethod
     def get(cls, token, userId, language, query, page):
         auto = language == "all" and query == "all"
         page = random.randint(0, 34) if auto else page
 
         try:
-            res = requests.get("https://api.github.com/search/repositories?q=open source " +
-                               ("" if auto else query) +
-                               ("" if auto else " language:" + language) + "&page=" + str(page),
-                               headers={ "Authorization":  "Bearer " + token })
+            res = requests.get(
+                cls.GET_REPOS_API_CALL
+                .replace("{query}", "" if auto else query)
+                .replace("{language}", "" if auto else " language:" + language)
+                .replace("{page}", str(page)),
+                headers={ "Authorization":  "Bearer " + token })
             res = res.json()['items']
             array = []
             for repo in res:
