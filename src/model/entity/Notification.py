@@ -26,6 +26,7 @@ class Notification(sql.Model):
             'user_id': self.user_id,
             'global_notification': self.global_notification,
             'title': self.title,
+            'removable': self.removable,
             'created_on': str(self.created_on),
             'content': self.content,
         }
