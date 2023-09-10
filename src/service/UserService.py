@@ -68,12 +68,6 @@ class UserService:
 
         requestUser = UserRepository.getUserByUsername(user['login'])
         if requestUser is not None:
-            NotificationService.create(
-                Constants.WELCOME_NOTIFICATION['content'],
-                Constants.WELCOME_NOTIFICATION['title'].replace("{username}", requestUser.username),
-                requestUser.user_id,
-                removable=False
-            )
             return Utils.createSuccessResponse(True, {
                 'token': create_access_token(identity=requestUser.toJSON(),
                                              expires_delta=timedelta(days=7)),
