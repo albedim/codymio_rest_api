@@ -13,10 +13,22 @@ repoGithub: Blueprint = Blueprint('RepoGithubController', __name__, url_prefix=U
 @repoGithub.route("/<repoId>/issues", methods=['GET'])
 @cross_origin()
 def getIssues(repoId):
-    return RepoGithubService.getIssues(Utils.getTokenManually(request), request.args.get("page"), request.args.get("userId"), repoId, request.args.get("repo_full_name"),)
+    return RepoGithubService.getIssues(
+        Utils.getTokenManually(request),
+        request.args.get("page"),
+        request.args.get("userId"),
+        repoId,
+        request.args.get("repo_full_name")
+    )
 
 
 @repoGithub.route("/fetch", methods=['GET'])
 @cross_origin()
 def getRepoGithub():
-    return RepoGithubService.get(Utils.getTokenManually(request), request.args.get("userId"), request.args.get("language"), request.args.get("query"), request.args.get("page"))
+    return RepoGithubService.get(
+        Utils.getTokenManually(request),
+        request.args.get("userId"),
+        request.args.get("language"),
+        request.args.get("query"),
+        request.args.get("page")
+    )

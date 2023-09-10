@@ -20,6 +20,8 @@ class Constants:
     ALREADY_CREATED = "This resource was already created"
     INVALID_REQUEST: str = "Invalid request"
 
+    SECRET_KEY = "dH278BJ38ddkaadek38d"
+
     LANGUAGES_COLORS = {
         "ABAP": "#E8274B",
         "ActionScript": "#882B0F",
@@ -424,6 +426,10 @@ class Constants:
         "Zephir"
     ]
 
+    WELCOME_NOTIFICATION = {
+        "title": "Welcome, {username}",
+        "content": "This is just the begin of your open-source career! Are you ready?"
+    }
     ADD_CONTRIBUTION_NOTIFICATION = {
         "title": "New contribution",
         "content": "You just started contributing to {repository}."

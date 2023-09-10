@@ -11,12 +11,13 @@ from src.model.repository.ContributionRepository import ContributionRepository
 class NotificationService:
 
     @classmethod
-    def create(cls, content, title, userId=0, globalNotification=False):
+    def create(cls, content, title, userId=0, globalNotification=False, removable=True):
         NotificationRepository.create(
             content,
             title,
             userId,
-            globalNotification
+            globalNotification,
+            removable
         )
 
     @classmethod

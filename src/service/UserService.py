@@ -5,6 +5,7 @@ import requests
 from flask_jwt_extended import create_access_token
 from src.model.entity.User import User
 from src.model.repository.UserRepository import UserRepository
+from src.service.NotificationService import NotificationService
 from src.utils.Constants import Constants
 from src.utils.Utils import Utils
 
@@ -30,7 +31,7 @@ class UserService:
             return Utils.createSuccessResponse(True, {
                 "token": create_access_token(
                     identity=user.toJson(),
-                    expires_delta=timedelta(weeks=4))
+                    expires_delta=timedelta(days=7))
             })
         else:
             return Utils.createWrongResponse(False, Constants.USER_NOT_FOUND, 404), 404
@@ -67,16 +68,28 @@ class UserService:
 
         requestUser = UserRepository.getUserByUsername(user['login'])
         if requestUser is not None:
+            NotificationService.create(
+                Constants.WELCOME_NOTIFICATION['content'],
+                Constants.WELCOME_NOTIFICATION['title'].replace("{username}", requestUser.username),
+                requestUser.user_id,
+                removable=False
+            )
             return Utils.createSuccessResponse(True, {
                 'token': create_access_token(identity=requestUser.toJSON(),
-                                             expires_delta=timedelta(weeks=4)),
+                                             expires_delta=timedelta(days=7)),
                 'github_token': githubToken
             })
 
         createdUser = UserRepository.signup(user['avatar_url'], user['id'], user['login'])
+        NotificationService.create(
+            Constants.WELCOME_NOTIFICATION['content'],
+            Constants.WELCOME_NOTIFICATION['title'].replace("{username}", createdUser.username),
+            createdUser.user_id,
+            removable=False
+        )
         return Utils.createSuccessResponse(True, {
             'token': create_access_token(identity=createdUser.toJSON(),
-                                         expires_delta=timedelta(weeks=4)),
+                                         expires_delta=timedelta(days=7)),
             'github_token': githubToken
         })
 
@@ -114,7 +127,7 @@ class UserService:
         return Utils.createSuccessResponse(True, {
                 "token": create_access_token(
                     identity=UserRepository.getUserById(userId).toJson(),
-                    expires_delta=timedelta(weeks=4))
+                    expires_delta=timedelta(days=7))
             })
 
     @classmethod
@@ -125,5 +138,7 @@ class UserService:
         else:
             return Utils.createSuccessResponse(False, {
                 "token": create_access_token(identity=user.toJSON(),
-                                             expires_delta=timedelta(weeks=4))
+                                             expires_delta=timedelta(days=7)),
+                "github_token": create_access_token(identity=user.toJSON(),
+                                             expires_delta=timedelta(days=7))
             })

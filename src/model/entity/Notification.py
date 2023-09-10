@@ -9,12 +9,14 @@ class Notification(sql.Model):
     user_id: int = sql.Column(sql.Integer, nullable=True)
     global_notification: bool = sql.Column(sql.Boolean, nullable=False)
     title: str = sql.Column(sql.String(40), nullable=False)
+    removable: bool = sql.Column(sql.Boolean, nullable=False)
     content: str = sql.Column(sql.String(140), nullable=False)
 
-    def __init__(self, content, title, userId, globalNotification=False):
+    def __init__(self, content, title, userId, globalNotification, removable):
         self.content = content
         self.created_on = datetime.date.today()
         self.title = title
+        self.removable = removable
         self.user_id = userId
         self.global_notification = globalNotification
 

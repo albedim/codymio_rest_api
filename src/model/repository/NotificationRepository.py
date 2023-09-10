@@ -8,8 +8,8 @@ from src.model.entity.Notification import Notification
 class NotificationRepository:
 
     @classmethod
-    def create(cls, content, title, userId, globalNotification):
-        notification = Notification(content, title, userId, globalNotification=globalNotification)
+    def create(cls, content, title, userId, globalNotification, removable):
+        notification = Notification(content, title, userId, globalNotification, removable)
         sql.session.add(notification)
         sql.session.commit()
         return notification
